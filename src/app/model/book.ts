@@ -8,7 +8,7 @@ export enum BOOK_STATUS {
   PREP = 'PREP',
   REPAIR = 'REPAIR',
   LIST = 'LIST',
-  SALE = 'SALE',
+//  SALE = 'SALE',
   HOLD = 'HOLD',
   KEEP = 'KEEP',
   SOLD = 'SOLD'
@@ -19,7 +19,7 @@ const BookStatusNames = new Map<string, string>([
   [BOOK_STATUS.PREP, 'Catalog in Progress'],
   [BOOK_STATUS.REPAIR, 'In Repair'],
   [BOOK_STATUS.LIST, 'In Store'],
-  [BOOK_STATUS.SALE, 'On Sale'],
+//  [BOOK_STATUS.SALE, 'On Sale'],
   [BOOK_STATUS.HOLD, 'Being Held'],
   [BOOK_STATUS.KEEP, 'Not For Sale'],
   [BOOK_STATUS.SOLD, 'Sold']
@@ -62,11 +62,14 @@ export class Book {
     public details: string;
     public contents: string;
     public notes: string;
+    public rarity: string;
+    public reprints: string;
 
-    public price: number;
     public priceBought: number;
     public priceMin: number;
     public priceMax: number;
+    public priceList: number;
+    public onSale: boolean;
 
     public dateBought: string;
     public dateSold: string;

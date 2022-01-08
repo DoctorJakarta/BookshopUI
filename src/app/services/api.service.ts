@@ -78,6 +78,10 @@ export class ApiService {
     return this.http.put<Array<string>>(_service + 'book', JSON.stringify(book), {headers: this.getAuthzHeaders()} );
   }
 
+  bulkUpdateBooks(updateField: string, updateValue: string, bookIds: []) {
+    return this.http.put<Array<string>>(_service + 'book/' + updateField + '/' + updateValue, bookIds, {headers: this.getAuthzHeaders()} );
+  }
+
   deleteBook(id: number) {
     return this.http.delete<Array<string>>(_service + 'book/' + id, {headers: this.getAuthzHeaders()} );
   }

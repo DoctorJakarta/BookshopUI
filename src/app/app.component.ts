@@ -23,7 +23,13 @@ export class AppComponent implements OnInit {
 
   public categories: Category[] = [
     { displayName: 'Home', route: 'home', icon: 'fa-home' },
-    { displayName: 'Books', route: 'book/List', icon: 'fa-columns' },
+    { displayName: 'Books', icon: 'fa-book', expanded: true,
+        subCategories: [
+            { displayName: 'Inventory', route: 'book/List', icon: 'fa-columns' },
+            { displayName: 'Selected', route: 'book/Selected', icon: 'fa-check-square' },
+            { displayName: 'On Sale', route: 'book/Sale', icon: 'fa-dollar' }
+        ]
+    },
     { displayName: 'Export', route: 'export', icon: 'fa-download' },
     { displayName: 'Configuration', icon: 'fa-cog', expanded: true,
         subCategories: [

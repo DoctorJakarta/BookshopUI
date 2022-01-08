@@ -13,14 +13,14 @@
 			<td>{{b.year}}</td>
 			<td>{{b.author}}</td>
 			<td>{{b.title}} </td>
-			<td>{{b.price}}</td>
+			<td>{{b.priceList}}</td>
 
 
         </tr>
 	</table>
 </div>
 
-<vdl-panel *ngIf="book && (pageType==PAGE_TYPE.EXPORT_BOOKS)">
+<vdl-panel *ngIf="books && (pageType==PAGE_TYPE.EXPORT_BOOKS)">
     {{ books | json }}
 </vdl-panel>
 
@@ -102,17 +102,19 @@
             </vdl-form-field>           
          <table border=1>
             <tr>
-                <th>Price</th>
                 <th>Price Bought</th>
                 <th>Price Min.</th>
                 <th>Price Max.</th>
+                <th>List Price</th>
+                <th>Sale %</th>
             </tr>
             <tr>
-                <td style="font-weight: boldest">$ <input vdlInput type="text" [(ngModel)]="book.price"/>.00</td>
                 <td style="color:grey">$ <input vdlInput type="text" [(ngModel)]="book.priceBought" />.00</td>
                 <td style="color:grey">$ <input vdlInput type="text" [(ngModel)]="book.priceMin"/>.00</td>
                 <td style="color:grey">$ <input vdlInput type="text" [(ngModel)]="book.priceMax"/>.00</td>
-            </tr>
+                <td style="font-weight: boldest">$ <input vdlInput type="text" [(ngModel)]="book.priceList"/>.00</td>
+                <td style="font-weight: boldest"><input vdlInput type="text" [(ngModel)]="book.salePercent" /> %</td>
+           </tr>
         </table>
         <vdl-form-field label="Date Bought" class="tinyField">
             <input vdlInput type="text" [(ngModel)]="book.dateBought" placeholder="YYYY-MM-DD"/>
@@ -174,7 +176,7 @@
             <button vdl-icon-button (click)="openReferenceDialog(r)">
                 <vdl-icon fontSet="fontawesome" fontIcon="fa-cog"></vdl-icon>
             </button>      
-            $ {{r.price}}:                
+            $ {{r.priceList}}:                
                 <button *ngIf="r.notes" vdl-icon-button vdlTooltip={{r.notes}}>
                     <vdl-icon fontSet="fontawesome" fontIcon="fa-info-circle"></vdl-icon>
                 </button>
@@ -190,7 +192,7 @@
 </vdl-panel>
 
 <vdl-panel *ngIf="pageType==PAGE_TYPE.LIST_BOOKS">
-<vdl-title-bar title="Book List"></vdl-title-bar>
+<vdl-title-bar title="Book Inventory"></vdl-title-bar>
    <fieldset style='width: 100%'>
         <legend>Seach books:</legend>
             <input type="text" [(ngModel)]="searchValue"/>
@@ -210,7 +212,39 @@
 
    <button vdl-secondary-button (click)="print()">Print</button>
 
+   <p>Show On Sale: {{ selectedOnSale }}
+   <p>Show Status: {{ selectedBookStatus }}
+</vdl-panel>
 
+<vdl-panel *ngIf="pageType==PAGE_TYPE.SELECTED_BOOKS">
+    <vdl-title-bar title="Selected Books"></vdl-title-bar>
+
+     <button vdl-secondary-button (click)="clearSelected()">Clear Selected</button>
+
+    <button vdl-secondary-button (click)="print()">Print</button>
+
+    <p>
+        <vdl-form-field label="Status" class="tinyField">
+            <vdl-select [(ngModel)]="statusUpdateValue" >
+                <vdl-option *ngFor="let s of getBookStatusKeys()" [value]="s">{{bookStatusNames.get(s)}}</vdl-option>
+            </vdl-select>
+        </vdl-form-field>  
+        <button vdl-secondary-button (click)="bulkFieldUpdate('status')">Bulk Status Update</button>
+
+        <vdl-form-field label="Sale Percent" class="tinyField">
+            <input vdlInput type="text" [(ngModel)]="saleUpdateValue" />
+        </vdl-form-field>
+          <button vdl-secondary-button (click)="bulkFieldUpdate('salePercent')">Bulk Sale Percent Update</button>
+
+ </vdl-panel>
+
+
+
+
+
+
+
+<vdl-panel *ngIf="pageType==PAGE_TYPE.LIST_BOOKS || pageType==PAGE_TYPE.SELECTED_BOOKS ">
     <table class="vdl-data-table material striped">
 		<tr>
             <th colspan=2></th>
@@ -218,7 +252,7 @@
             <th colspan=4>Price</th>
         </tr>
 		<tr>
-            <th></th>
+            <th colspan=2></th>
             <th>ID</th>
             <th>URL</th>
             <th>Year</th>
@@ -228,20 +262,30 @@
             <th>Vol.</th>
             <th>Rare</th>
             <th>Reprint</th>
-            <th>Sell</th>
             <th>Bought</th>
             <th>Min</th>
             <th>Max</th>
+            <th>List</th>
+            <th>Sale %</th>
+            <th>On Sale
+                <vdl-select (selectionChange)="filterBooks()" [(ngModel)]="selectedOnSale">
+                    <vdl-option>All</vdl-option>
+                    <vdl-option value=true>On Sale</vdl-option>
+                    <vdl-option value=false>Not On Sale</vdl-option>
+                </vdl-select>              
+            </th>
             <th>Status<br/>
-                <vdl-select (selectionChange)="filterBookStatus()" [(ngModel)]="selectedBookStatus">
+                <vdl-select (selectionChange)="filterBooks()" [(ngModel)]="selectedBookStatus">
                     <vdl-option value="0">All</vdl-option>
                     <vdl-option *ngFor="let s of getBookStatusKeys()" [value]="s">{{bookStatusNames.get(s)}}</vdl-option>
                 </vdl-select>
 
             </th>
        </tr>
-		<tr [ngClass]="{'data-table-row-odd':o}" *ngFor='let b of books | bookStatusFilter: selectedBookStatus; let o=odd;'>
-            <td align=center>
+		<tr [ngClass]="{'data-table-row-odd':o}" *ngFor='let b of books | bookStatusFilter: selectedBookStatus | onSaleFilter: selectedOnSale; let o=odd;'>
+             <td>
+                <input type=checkbox (click)="toggleSelect(b)" [checked]="isSelected(b)" />
+            </td><td align=center>
                 <button vdl-icon-button (click)="editBook(b.id)">
                     <vdl-icon fontSet="fontawesome" fontIcon="fa-cog"></vdl-icon>
                 </button>
@@ -266,10 +310,12 @@
 			<td>{{b.volume}}</td>
 			<td>{{b.rarity}}</td>
 			<td>{{b.reprint}}</td>
-			<td>{{b.price}}</td>
 			<td>{{b.priceBought}}</td>
 			<td>{{b.priceMin}}</td>
 			<td>{{b.priceMax}}</td>
+			<td>{{b.priceList}}</td>
+			<td>{{b.salePercent > 0 ? b.salePercent : ''}}</td>
+			<td>{{b.onSale}}</td>
 			<td>{{b.status}}</td>
 <!--        SDon't show DELETE trash can on list.  Must go to details page to delete.
             <td align=center>
@@ -282,6 +328,5 @@
         </tr>
 	</table>
 </vdl-panel>
-
 
 

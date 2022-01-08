@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
-import { CacheService } from '../../services/cache.service';
+import { CacheService, SESSION, LOCAL } from '../../services/cache.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Book, BOOK_STATUS } from '../../model/book';
 import { Attribute, ATTR } from '../../model/attribute';
@@ -14,12 +14,14 @@ import { ReferenceComponent } from '../reference/reference.component';
 import { VdlDialog } from '@vdlx/vdl-angular/dialog';
 import { VdlDialogConfig } from '@vdlx/vdl-angular/dialog';
 import { VdlDialogRef } from '@vdlx/vdl-angular/dialog';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 export enum PAGE_TYPE {
     LIST_BOOKS = 'List',
     NEW_BOOK = 'New',
     EDIT_BOOK = 'Edit',
-    EXPORT_BOOKS = 'Export'
+    EXPORT_BOOKS = 'Export',
+    SELECTED_BOOKS = 'Selected'
 }
 export enum SEARCH_TYPE {
     YEAR    = 'year',
@@ -48,6 +50,7 @@ export class BookComponent implements OnInit {
     bookStatusNames = Book.getStatusNames();
     // selectedStatus = BOOK_STATUS.PREP;
     selectedBookStatus = '0';
+    selectedOnSale: boolean;
 
     // CONDITION: typeof CONDITION = CONDITION;    // This exposes the enum to the HTML
     // conditionList: string[] = new Array("New", "As New", "Fine", "Near Fine", "Very Good", "Good", "Fair", "Poor");
@@ -72,6 +75,12 @@ export class BookComponent implements OnInit {
     searchValue: string;
     searchTag: string;
 
+    // selectedBookIds: number[] = [];
+    // selectedBookIds: any;              // I don't know how to filter based on the equivalence of an Object
+    // selectedBooks: any;
+    statusUpdateValue: any;
+    saleUpdateValue: any;
+
     constructor(private apiService: ApiService, private cacheService: CacheService,
                 private dialog: VdlDialog,
                 private route: ActivatedRoute, private router: Router) {
@@ -81,6 +90,10 @@ export class BookComponent implements OnInit {
         this.route.params.subscribe(params => {
             if (params['pageType']) this.pageType = params['pageType'];
             if ( params['bookStatus']) this.selectedBookStatus = params['bookStatus'];
+            if ( params['onSale']){
+               if (params['onSale'].toLowerCase() === 'true') this.selectedOnSale = true;
+               else if (params['onSale'].toLowerCase() === 'false') this.selectedOnSale = false;
+            } 
 
             switch (this.pageType) {
                 case PAGE_TYPE.NEW_BOOK:
@@ -92,7 +105,7 @@ export class BookComponent implements OnInit {
                     break;
                 case PAGE_TYPE.LIST_BOOKS:
                 case PAGE_TYPE.EXPORT_BOOKS:
-                    if (params['searchType']) {
+                     if (params['searchType']) {
                         this.searchType = params['searchType'];
                         this.searchValue = params['searchValue'];
                         this.books = this.searchBy(this.searchType, this.searchValue);
@@ -101,16 +114,32 @@ export class BookComponent implements OnInit {
                         this.searchTag = params['searchTag'];
                         this.books = this.searchBy(this.searchType, this.searchValue);
                     }
-                    else this.books = this.getBooks();
+                    else this.books = this.getAllBooks(false);
+                    break;
+
+                case PAGE_TYPE.SELECTED_BOOKS:
+                    // this.getAllBooks(true);
+                    this.books =  this.cacheService.get(LOCAL.selectedBooks);
                     break;
            }
         });
     }
 
     listBooks() { this.router.navigate(['book', PAGE_TYPE.LIST_BOOKS]); }
+    selectedBooks() { this.router.navigate(['book', PAGE_TYPE.SELECTED_BOOKS]); }
     newBook() { this.router.navigate(['book', PAGE_TYPE.NEW_BOOK]); }
     editBook(id: number) { this.router.navigate(['book', PAGE_TYPE.EDIT_BOOK, { bookId: id} ] ); }
     exportBooks() { this.router.navigate(['book', PAGE_TYPE.EXPORT_BOOKS]); }
+
+    resetSelectedBooks(){                   // Updates change the book parameters, so they need to be updated from what is in the database
+        const selectedIds = this.cacheService.get(LOCAL.selectedBookIds);
+        const selectedBooks = [];
+        for (const b of this.books){
+            if ( selectedIds.includes(b.id)) selectedBooks.push(b);
+        }
+        this.cacheService.set(LOCAL.selectedBooks, selectedBooks);
+        this.books =  this.cacheService.get(LOCAL.selectedBooks);
+    }
 
     getCacheLists() {
         this.subjects = this.cacheService.getSubjects();
@@ -123,7 +152,7 @@ export class BookComponent implements OnInit {
     }
 
     searchBooks(searchType: string) {
-        alert("Searching for: " + this.searchValue);
+        alert('Searching for: ' + this.searchValue);
         this.router.navigate(['book', PAGE_TYPE.LIST_BOOKS, { searchType: searchType, searchValue: this.searchValue} ] );
     }
     returnToSearch() {
@@ -144,10 +173,11 @@ export class BookComponent implements OnInit {
         );
     }
 
-    getBooks() {
+    getAllBooks(resetSelectedBooks: boolean) {
         this.apiService.readBooks().subscribe(
             success => {
                 this.books = success;
+                if (resetSelectedBooks) this.resetSelectedBooks();
             },
             error => this.apiService.handleError(error)
         );
@@ -197,7 +227,7 @@ export class BookComponent implements OnInit {
     }
 
     public deleteReference(ref: Reference) {
-        if (confirm('Are you sure you want to delet the reference: ' + ref.desc)) {
+        if (confirm('Are you sure you want to delete the reference: ' + ref.desc)) {
             this.apiService.deleteReference(ref).subscribe(
                 success => {
                     this.listBooks();
@@ -259,9 +289,10 @@ export class BookComponent implements OnInit {
         window.open(this.BASE_URL + url, '_blank');
     }
 
-    filterBookStatus() {
-        this.router.navigate(['book', PAGE_TYPE.LIST_BOOKS, { bookStatus: this.selectedBookStatus }]);
+    filterBooks() {
+        this.router.navigate(['book', PAGE_TYPE.LIST_BOOKS, { bookStatus: this.selectedBookStatus, onSale: this.selectedOnSale }]);
     }
+
 
     getBookStatusKeys() {
         return Array.from(this.bookStatusNames.keys());
@@ -289,6 +320,65 @@ export class BookComponent implements OnInit {
       );
       popupWin.document.close();
   }
+
+    isSelected(book: Book) {
+        const id = book.id;
+        return this.cacheService.get(LOCAL.selectedBookIds).includes(id);
+        // return this.cacheService.get(LOCAL.selectedBooks).includes(book);        // I don't know how to filter based on the equivalence of an Object
+    }
+
+    toggleSelect(book: Book) {
+        const id = book.id;
+        let bookIds = this.cacheService.get(LOCAL.selectedBookIds);
+        let books = this.cacheService.get(LOCAL.selectedBooks);
+        if (bookIds.includes(id)) {                                                 // I don't know how to filter based on the equivalence of an Object
+            // alert('Already got bookId: ' + id);
+            bookIds = bookIds.filter(aBookId => aBookId !== id);
+            this.cacheService.set(LOCAL.selectedBookIds, bookIds);
+
+            books = books.filter(aBook => aBook.id !== id);
+            this.cacheService.set(LOCAL.selectedBooks, books);
+        }
+        else {
+            // alert('Selecting bookId: ' + id);
+            bookIds.push(id);
+            this.cacheService.set(LOCAL.selectedBookIds, bookIds);
+
+            books.push(book);
+            this.cacheService.set(LOCAL.selectedBooks, books);
+        }
+    }
+
+    bulkFieldUpdate(updateField: string) {
+        const bookIds = this.cacheService.get(LOCAL.selectedBookIds);
+        let updateFieldValue;
+        switch (updateField) {
+            case 'status':
+                updateFieldValue = this.statusUpdateValue;
+                break;
+             case 'salePercent':
+                updateFieldValue = this.saleUpdateValue;
+                break;
+            default:
+                alert('Invalid selection');
+                return;
+        }
+
+        if (confirm('Are you sure you want to update selected books with: ' + updateFieldValue)) {
+            this.apiService.bulkUpdateBooks(updateField, updateFieldValue, bookIds).subscribe(
+                success => {
+                     this.getAllBooks(true);
+                }
+            );
+        }
+     }
+
+    clearSelected() {
+        if ( confirm('Clear ALL Checkboxes:') ){
+            this.cacheService.set(LOCAL.selectedBookIds, []);
+            this.cacheService.set(LOCAL.selectedBooks, []);
+        }
+    }
 
     ngOnInit() {
 

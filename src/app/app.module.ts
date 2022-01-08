@@ -9,7 +9,6 @@ import { ROUTES } from './app.routes';
 import { RouterModule, PreloadAllModules } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // import './styles/global.scss';
- 
 import { HomeComponent } from './components/home/home.component';
 
 import { ApiService } from './services/api.service';
@@ -21,6 +20,7 @@ import { SubjectComponent } from './components/subject/subject.component';
 import { DetailComponent } from './components/detail/detail.component';
 import { ExportComponent } from './components/export/export.component';
 import { LoginComponent } from './components/login/login.component';
+import { OnSaleFilterPipe } from './pipes/on-sale-filter.pipe';
 import { BookStatusFilterPipe } from './pipes/book-status-filter.pipe';
 
 @NgModule({
@@ -35,7 +35,9 @@ import { BookStatusFilterPipe } from './pipes/book-status-filter.pipe';
     DetailComponent,
     ExportComponent,
     LoginComponent,
-    BookStatusFilterPipe
+    OnSaleFilterPipe,
+    BookStatusFilterPipe,
+    OnSaleFilterPipe
   ],
   imports: [
     HttpClientModule,
