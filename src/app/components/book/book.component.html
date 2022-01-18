@@ -216,10 +216,17 @@
    <p>Show Status: {{ selectedBookStatus }}
 </vdl-panel>
 
+<vdl-panel *ngIf="pageType==PAGE_TYPE.SALE_BOOKS">
+    <vdl-title-bar title="Sale Books"></vdl-title-bar>
+
+    <button vdl-secondary-button (click)="print()">Print</button>
+
+ </vdl-panel>
+
 <vdl-panel *ngIf="pageType==PAGE_TYPE.SELECTED_BOOKS">
     <vdl-title-bar title="Selected Books"></vdl-title-bar>
 
-     <button vdl-secondary-button (click)="clearSelected()">Clear Selected</button>
+    <button vdl-secondary-button (click)="clearSelected()">Clear Selected</button>
 
     <button vdl-secondary-button (click)="print()">Print</button>
 
@@ -235,16 +242,14 @@
             <input vdlInput type="text" [(ngModel)]="saleUpdateValue" />
         </vdl-form-field>
           <button vdl-secondary-button (click)="bulkFieldUpdate('salePercent')">Bulk Sale Percent Update</button>
-
- </vdl-panel>
-
+    </vdl-panel>
 
 
 
 
 
 
-<vdl-panel *ngIf="pageType==PAGE_TYPE.LIST_BOOKS || pageType==PAGE_TYPE.SELECTED_BOOKS ">
+<vdl-panel *ngIf="pageType==PAGE_TYPE.LIST_BOOKS || pageType==PAGE_TYPE.SELECTED_BOOKS || pageType==PAGE_TYPE.SALE_BOOKS">
     <table class="vdl-data-table material striped">
 		<tr>
             <th colspan=2></th>

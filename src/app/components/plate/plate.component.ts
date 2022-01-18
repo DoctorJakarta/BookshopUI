@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService, ITEM_TYPE } from '../../services/api.service';
 import { CacheService, SESSION, LOCAL } from '../../services/cache.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Book, BOOK_STATUS } from '../../model/book';
+import { Plate, PLATE_STATUS } from '../../model/plate';
 import { Attribute, ATTR } from '../../model/attribute';
 import { Subject } from '../../model/subject';
 import { Tag } from '../../model/tag';
@@ -17,12 +17,12 @@ import { VdlDialogRef } from '@vdlx/vdl-angular/dialog';
 import { BreakpointObserver } from '@angular/cdk/layout';
 
 export enum PAGE_TYPE {
-    LIST_BOOKS = 'List',
-    NEW_BOOK = 'New',
-    EDIT_BOOK = 'Edit',
-    EXPORT_BOOKS = 'Export',
-    SELECTED_BOOKS = 'Selected',
-    SALE_BOOKS = 'Sale'
+    LIST_PLATES = 'List',
+    NEW_PLATE = 'New',
+    EDIT_PLATE = 'Edit',
+    EXPORT_PLATES = 'Export',
+    SELECTED_PLATES = 'Selected',
+    SALE_PLATES = 'Sale'
 }
 export enum SEARCH_TYPE {
     YEAR    = 'year',
@@ -31,26 +31,25 @@ export enum SEARCH_TYPE {
 }
 
 @Component({
-  selector: 'app-book',
-  templateUrl: './book.component.html',
-  styleUrls: ['./book.component.css']
+  selector: 'app-plate',
+  templateUrl: './plate.component.html',
+  styleUrls: ['./plate.component.css']
 })
 
-export class BookComponent implements OnInit {
+export class PlateComponent implements OnInit {
 
-    BASE_URL = 'http://localhost/books/';
+    BASE_URL = 'http://localhost/plates/';
 
     public dialogRef: VdlDialogRef<ReferenceComponent>;
 
     SEARCH_TYPE: typeof SEARCH_TYPE = SEARCH_TYPE;        // This exposed the enum to the HTML
 
     PAGE_TYPE: typeof PAGE_TYPE = PAGE_TYPE;        // This exposed the enum to the HTML
-    pageType = PAGE_TYPE.LIST_BOOKS;
+    pageType = PAGE_TYPE.LIST_PLATES;
 
-    BOOK_STATUS: typeof BOOK_STATUS = BOOK_STATUS;    // This exposes the enum to the HTML
-    bookStatusNames = Book.getStatusNames();
-    // selectedStatus = BOOK_STATUS.PREP;
-    selectedBookStatus = '0';
+    PLATE_STATUS: typeof PLATE_STATUS = PLATE_STATUS;    // This exposes the enum to the HTML
+    plateStatusNames = Plate.getStatusNames();
+    selectedPlateStatus = '0';
     selectedOnSale: boolean;
 
     // CONDITION: typeof CONDITION = CONDITION;    // This exposes the enum to the HTML
@@ -65,9 +64,8 @@ export class BookComponent implements OnInit {
 
     subjects: Subject[] = [];
 
-    books: any;
-    book: any;
-    tags: Tag[];
+    plates: any;
+    plate: any;
     tagCheckboxMap: Map<number, TagCheckbox>;
 
     reference: any;
@@ -76,10 +74,7 @@ export class BookComponent implements OnInit {
     searchValue: string;
     searchTag: string;
 
-    // selectedBookIds: number[] = [];
-    // selectedBookIds: any;              // I don't know how to filter based on the equivalence of an Object
-    // selectedBooks: any;
-    statusUpdateValue: any;
+     statusUpdateValue: any;
     saleUpdateValue: any;
 
     constructor(private apiService: ApiService, private cacheService: CacheService,
@@ -90,65 +85,63 @@ export class BookComponent implements OnInit {
 
         this.route.params.subscribe(params => {
             if (params['pageType']) this.pageType = params['pageType'];
-            if ( params['bookStatus']) this.selectedBookStatus = params['bookStatus'];
+            if ( params['plateStatus']) this.selectedPlateStatus = params['plateStatus'];
             if ( params['onSale']){
                if (params['onSale'].toLowerCase() === 'true') this.selectedOnSale = true;
                else if (params['onSale'].toLowerCase() === 'false') this.selectedOnSale = false;
             } 
 
             switch (this.pageType) {
-                case PAGE_TYPE.NEW_BOOK:
+                case PAGE_TYPE.NEW_PLATE:
                     this.tagCheckboxMap = this.cacheService.getTagCheckboxMap(null);
-                    this.book = new Book();
+                    this.plate = new Plate();
                     break;
-                case PAGE_TYPE.EDIT_BOOK:
-                    this.book = this.getBook( params['bookId'] );
+                case PAGE_TYPE.EDIT_PLATE:
+                    this.plate = this.getItem(params['plateId'] );
                     break;
-                case PAGE_TYPE.LIST_BOOKS:
-                case PAGE_TYPE.EXPORT_BOOKS:
+                case PAGE_TYPE.LIST_PLATES:
+                case PAGE_TYPE.EXPORT_PLATES:
                      if (params['searchType']) {
                         this.searchType = params['searchType'];
                         this.searchValue = params['searchValue'];
-                        this.books = this.searchBy(this.searchType, this.searchValue);
+                        this.plates = this.searchBy(this.searchType, this.searchValue);
                     }
                     else if (params['searchTag']) {
                         this.searchTag = params['searchTag'];
-                        this.books = this.searchBy(this.searchType, this.searchValue);
+                        this.plates = this.searchBy(this.searchType, this.searchValue);
                     }
-                    else this.books = this.getAllBooks(false);
+                    else this.plates = this.getAllPlates(false);
                     break;
 
-                case PAGE_TYPE.SALE_BOOKS:
-                    this.getSaleBooks();
+                case PAGE_TYPE.SALE_PLATES:
+                    this.getSalePlates();
                     break;
 
-               case PAGE_TYPE.SELECTED_BOOKS:
-                    // this.getAllBooks(true);
-                    this.books =  this.cacheService.get(LOCAL.selectedBooks);
+               case PAGE_TYPE.SELECTED_PLATES:
+                     this.plates =  this.cacheService.get(LOCAL.selectedPlates);
                     break;
            }
         });
     }
 
-    listBooks() { this.router.navigate(['book', PAGE_TYPE.LIST_BOOKS]); }
-    selectedBooks() { this.router.navigate(['book', PAGE_TYPE.SELECTED_BOOKS]); }
-    newBook() { this.router.navigate(['book', PAGE_TYPE.NEW_BOOK]); }
-    editBook(id: number) { this.router.navigate(['book', PAGE_TYPE.EDIT_BOOK, { bookId: id} ] ); }
-    exportBooks() { this.router.navigate(['book', PAGE_TYPE.EXPORT_BOOKS]); }
+    listPlates() { this.router.navigate(['plate', PAGE_TYPE.LIST_PLATES]); }
+    selectedPlates() { this.router.navigate(['plate', PAGE_TYPE.SELECTED_PLATES]); }
+    newPlate() { this.router.navigate(['plate', PAGE_TYPE.NEW_PLATE]); }
+    editPlate(id: number) { this.router.navigate(['plate', PAGE_TYPE.EDIT_PLATE, { plateId: id} ] ); }
+    exportPlates() { this.router.navigate(['plate', PAGE_TYPE.EXPORT_PLATES]); }
 
-    resetSelectedBooks(){                   // Updates change the book parameters, so they need to be updated from what is in the database
-        const selectedIds = this.cacheService.get(LOCAL.selectedBookIds);
-        const selectedBooks = [];
-        for (const b of this.books){
-            if ( selectedIds.includes(b.id)) selectedBooks.push(b);
+    resetSelectedPlates(){                   // Updates change the plate parameters, so they need to be updated from what is in the database
+        const selectedIds = this.cacheService.get(LOCAL.selectedPlateIds);
+        const selectedPlates = [];
+        for (const b of this.plates){
+            if ( selectedIds.includes(b.id)) selectedPlates.push(b);
         }
-        this.cacheService.set(LOCAL.selectedBooks, selectedBooks);
-        this.books =  this.cacheService.get(LOCAL.selectedBooks);
+        this.cacheService.set(LOCAL.selectedPlates, selectedPlates);
+        this.plates =  this.cacheService.get(LOCAL.selectedPlates);
     }
 
     getCacheLists() {
         this.subjects = this.cacheService.getSubjects();
-        this.tags = this.cacheService.getTags();
         this.attrBinding = this.cacheService.getAttribute(ATTR.BINDING);
         this.attrCondition = this.cacheService.getAttribute(ATTR.CONDITION);
         this.attrSize = this.cacheService.getAttribute(ATTR.SIZE);
@@ -156,82 +149,77 @@ export class BookComponent implements OnInit {
         this.attrReprints = this.cacheService.getAttribute(ATTR.REPRINTS);
     }
 
-    searchBooks(searchType: string) {
+    searchPlates(searchType: string) {
         alert('Searching for: ' + this.searchValue);
-        this.router.navigate(['book', PAGE_TYPE.LIST_BOOKS, { searchType: searchType, searchValue: this.searchValue} ] );
+        this.router.navigate(['plate', PAGE_TYPE.LIST_PLATES, { searchType: searchType, searchValue: this.searchValue} ] );
     }
     returnToSearch() {
         console.log('Returning to search with type: ' + this.searchType  );
         console.log('Returning to search with value: ' + this.searchValue  );
         if ( this.searchType ) {
-            this.searchBooks(this.searchType);
+            this.searchPlates(this.searchType);
         } else {
-            this.listBooks();
+            this.listPlates();
         }
     }
-    searchBy(type: string, value: string) {
-        this.apiService.searchItemsBy(ITEM_TYPE.BOOK, type, value).subscribe(
+    searchBy(field: string, value: string) {
+        this.apiService.searchItemsBy(ITEM_TYPE.PLATE, field, value).subscribe(
             success => {
-                this.books = success;
+                this.plates = success;
             },
             error => this.apiService.handleError(error)
         );
     }
 
-    getAllBooks(resetSelectedBooks: boolean) {
-        this.apiService.readItems(ITEM_TYPE.BOOK).subscribe(
+    getAllPlates(resetSelectedPlates: boolean) {
+        this.apiService.readItems(ITEM_TYPE.PLATE).subscribe(
             success => {
-                this.books = success;
-                if (resetSelectedBooks) this.resetSelectedBooks();
+                this.plates = success;
+                if (resetSelectedPlates) this.resetSelectedPlates();
             },
             error => this.apiService.handleError(error)
         );
     }
 
-    getSaleBooks() {
-        this.apiService.readSaleItems(ITEM_TYPE.BOOK).subscribe(
+    getSalePlates() {
+        this.apiService.readSaleItems(ITEM_TYPE.PLATE).subscribe(
             success => {
-                this.books = success;
+                this.plates = success;
             },
             error => this.apiService.handleError(error)
         );
     }
 
-    getBook(id: number) {
-        this.apiService.readItem(ITEM_TYPE.BOOK, id).subscribe(
+    getItem(id: number) {
+        this.apiService.readItem(ITEM_TYPE.PLATE, id).subscribe(
             success => {
-                this.book = success;
-                this.tagCheckboxMap = this.cacheService.getTagCheckboxMap(this.book.tags);
+                this.plate = success;
              },
             error => this.apiService.handleError(error)
         );
     }
 
-    upsertBook() {
-        console.log('Upserting book with tagCheckboxMap: ' + this.tagCheckboxMap.size);
-
-        this.book.tags = this.getSelectedTags();
-
-        console.log('Upserting book with tags: ' + this.book.tags.length);
-        let apiServiceRequest;
-        if ( this.book.id ) apiServiceRequest = this.apiService.updateItem(ITEM_TYPE.BOOK, this.book);
-        else                apiServiceRequest = this.apiService.createItem(ITEM_TYPE.BOOK, this.book);
+    upsertPlate(plate: Plate) {
+        console.log('Upserting plate with tagCheckboxMap: ' + this.tagCheckboxMap.size);
+       let apiServiceRequest;
+        if ( this.plate.id ) apiServiceRequest = this.apiService.updateItem(ITEM_TYPE.PLATE, this.plate);
+        else                 apiServiceRequest = this.apiService.createItem(ITEM_TYPE.PLATE, this.plate);
 
 
         apiServiceRequest.subscribe(
             success => {
-                // this.listBooks();
+                // this.listPlates();
                 this.returnToSearch();
             },
             error => this.apiService.handleError(error)
         );
     }
 
-    deleteBook(id: number) {
-        if ( confirm('Are you sure you want to delete the book, instead of inactivating it?')) {
-            this.apiService.deleteItem(ITEM_TYPE.BOOK, id).subscribe(
+    deletePlate(id: number) {
+        if ( confirm('Are you sure you want to delete the plate, instead of inactivating it?')) {
+            this.apiService.deleteItem(ITEM_TYPE.PLATE, id).subscribe(
                 success => {
-                    this.listBooks();
+                    this.listPlates();
                 },
                 error => this.apiService.handleError(error)
             );
@@ -242,14 +230,14 @@ export class BookComponent implements OnInit {
         if (confirm('Are you sure you want to delete the reference: ' + ref.desc)) {
             this.apiService.deleteReference(ref).subscribe(
                 success => {
-                    this.listBooks();
+                    this.listPlates();
                 }
             );
         }
     }
     public openReferenceDialog(ref?: Reference) {
         console.log('Opening Reference Dialog: ' + ref);
-       if ( ref == null ) this.reference = new Reference(this.book.id);
+       if ( ref == null ) this.reference = new Reference(this.plate.id);
        else { this.reference = ref; }
 
         const dialogConfig = new VdlDialogConfig();
@@ -267,7 +255,7 @@ export class BookComponent implements OnInit {
                 if ( newReference.id ) service = this.apiService.updateReference(newReference);
                 service.subscribe(
                     success => {
-                        // this.listBooks();
+                        // this.listPlates();
                         this.returnToSearch();
                   },
                     error =>  this.apiService.handleError(error)
@@ -281,16 +269,8 @@ export class BookComponent implements OnInit {
         );
     }
 
-    getSelectedTags() {
-        const selectedTags: Tag[] = [];
-        for ( const t of this.cacheService.getTags() ) {
-            if (this.tagCheckboxMap.get(t.id).checked) { selectedTags.push(t); }
-        }
-        return selectedTags;
-    }
-
     getSaleStatusKeys() {
-        return Array.from(this.bookStatusNames.keys());
+        return Array.from(this.plateStatusNames.keys());
     }
 
     // getConditionKeys() {
@@ -301,13 +281,13 @@ export class BookComponent implements OnInit {
         window.open(this.BASE_URL + url, '_blank');
     }
 
-    filterBooks() {
-        this.router.navigate(['book', PAGE_TYPE.LIST_BOOKS, { bookStatus: this.selectedBookStatus, onSale: this.selectedOnSale }]);
+    filterPlates() {
+        this.router.navigate(['plate', PAGE_TYPE.LIST_PLATES, { plateStatus: this.selectedPlateStatus, onSale: this.selectedOnSale }]);
     }
 
 
-    getBookStatusKeys() {
-        return Array.from(this.bookStatusNames.keys());
+    getPlateStatusKeys() {
+        return Array.from(this.plateStatusNames.keys());
     }
 
     print(): void {
@@ -333,36 +313,36 @@ export class BookComponent implements OnInit {
       popupWin.document.close();
   }
 
-    isSelected(book: Book) {
-        const id = book.id;
-        return this.cacheService.get(LOCAL.selectedBookIds).includes(id);
-        // return this.cacheService.get(LOCAL.selectedBooks).includes(book);        // I don't know how to filter based on the equivalence of an Object
+    isSelected(plate: Plate) {
+        const id = plate.id;
+        return this.cacheService.get(LOCAL.selectedPlateIds).includes(id);
+        // return this.cacheService.get(LOCAL.selectedPlates).includes(plate);        // I don't know how to filter based on the equivalence of an Object
     }
 
-    toggleSelect(book: Book) {
-        const id = book.id;
-        let bookIds = this.cacheService.get(LOCAL.selectedBookIds);
-        let books = this.cacheService.get(LOCAL.selectedBooks);
-        if (bookIds.includes(id)) {                                                 // I don't know how to filter based on the equivalence of an Object
-            // alert('Already got bookId: ' + id);
-            bookIds = bookIds.filter(aBookId => aBookId !== id);
-            this.cacheService.set(LOCAL.selectedBookIds, bookIds);
+    toggleSelect(plate: Plate) {
+        const id = plate.id;
+        let plateIds = this.cacheService.get(LOCAL.selectedPlateIds);
+        let plates = this.cacheService.get(LOCAL.selectedPlates);
+        if (plateIds.includes(id)) {                                                 // I don't know how to filter based on the equivalence of an Object
+            // alert('Already got plateId: ' + id);
+            plateIds = plateIds.filter(aPlateId => aPlateId !== id);
+            this.cacheService.set(LOCAL.selectedPlateIds, plateIds);
 
-            books = books.filter(aBook => aBook.id !== id);
-            this.cacheService.set(LOCAL.selectedBooks, books);
+            plates = plates.filter(aPlate => aPlate.id !== id);
+            this.cacheService.set(LOCAL.selectedPlates, plates);
         }
         else {
-            // alert('Selecting bookId: ' + id);
-            bookIds.push(id);
-            this.cacheService.set(LOCAL.selectedBookIds, bookIds);
+            // alert('Selecting plateId: ' + id);
+            plateIds.push(id);
+            this.cacheService.set(LOCAL.selectedPlateIds, plateIds);
 
-            books.push(book);
-            this.cacheService.set(LOCAL.selectedBooks, books);
+            plates.push(plate);
+            this.cacheService.set(LOCAL.selectedPlates, plates);
         }
     }
 
     bulkFieldUpdate(updateField: string) {
-        const bookIds = this.cacheService.get(LOCAL.selectedBookIds);
+        const plateIds = this.cacheService.get(LOCAL.selectedPlateIds);
         let updateFieldValue;
         switch (updateField) {
             case 'status':
@@ -376,10 +356,10 @@ export class BookComponent implements OnInit {
                 return;
         }
 
-        if (confirm('Are you sure you want to update selected books with: ' + updateFieldValue)) {
-            this.apiService.bulkUpdateItems(ITEM_TYPE.BOOK, updateField, updateFieldValue, bookIds).subscribe(
+        if (confirm('Are you sure you want to update selected plates with: ' + updateFieldValue)) {
+            this.apiService.bulkUpdateItems(ITEM_TYPE.PLATE, updateField, updateFieldValue, plateIds).subscribe(
                 success => {
-                     this.getAllBooks(true);
+                     this.getAllPlates(true);
                 }
             );
         }
@@ -387,8 +367,8 @@ export class BookComponent implements OnInit {
 
     clearSelected() {
         if ( confirm('Clear ALL Checkboxes:') ){
-            this.cacheService.set(LOCAL.selectedBookIds, []);
-            this.cacheService.set(LOCAL.selectedBooks, []);
+            this.cacheService.set(LOCAL.selectedPlateIds, []);
+            this.cacheService.set(LOCAL.selectedPlates, []);
         }
     }
 

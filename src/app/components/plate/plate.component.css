@@ -1,0 +1,29 @@
+#print-section{ display: none;}
+
+.bookForm{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px;
+}
+.mediumField{
+    width: 350px;
+    padding: -30px 0px;
+    display: block;
+}
+.smallField{
+    width: 235px;
+    padding: -30px 0px;
+}
+.tinyField{
+    width: 115px;
+    padding: -30px 0px;
+}
+td input{
+     width: 40px;
+     display: inline;
+     text-align: right;
+     padding: 0px 5px;
+     font-size: large;
+}

@@ -1,0 +1,204 @@
+<div id="print-section">
+    <table border=1 >
+		<tr>
+            <th>Id</th>
+            <th>Year</th>
+            <th>Author</th>
+            <th>Title</th>
+            <th>Price</th>
+
+        </tr>
+		<tr *ngFor='let b of plates; let o=odd;'>  
+			<td>{{b.id}}</td>
+			<td>{{b.year}}</td>
+			<td>{{b.author}}</td>
+			<td>{{b.title}} </td>
+			<td>{{b.priceList}}</td>
+
+
+        </tr>
+	</table>
+</div>
+
+<vdl-panel *ngIf="plates && (pageType==PAGE_TYPE.EXPORT_PLATES)">
+    {{ plates | json }}
+</vdl-panel>
+
+<vdl-panel *ngIf="plate && (pageType==PAGE_TYPE.NEW_PLATE || pageType==PAGE_TYPE.EDIT_PLATE)">
+<vdl-title-bar title="Plate Details"></vdl-title-bar>
+    <button vdl-primary-button (click)="upsertPlate()">{{plate.id ? 'Update' : 'Create'}}</button>
+    <button vdl-secondary-button (click)="deletePlate()">Delete</button>
+    <button vdl-secondary-button (click)="listPlates()">Cancel</button>
+ 
+    <div class="plateForm">
+            <vdl-form-field label="Name" class="mediumField">
+                <input vdlInput type="text" [(ngModel)]="plate.name"/>
+            </vdl-form-field>
+
+           <vdl-form-field label="Condition" class="tinyField">
+               <input vdlInput type="text" [(ngModel)]="plate.condition"/>
+            </vdl-form-field>
+
+         <vdl-form-field label="Price List" class="tinyField">
+               <input vdlInput type="text" [(ngModel)]="plate.priceList"/>
+            </vdl-form-field>
+
+   
+          <vdl-form-field label="Date Sold" class="tinyField">
+            <input vdlInput type="text" [(ngModel)]="plate.dateSold" placeholder="YYYY-MM-DD"/>
+        </vdl-form-field>
+        <vdl-form-field label="Sale Status" class="tinyField">
+            <vdl-select [(ngModel)]="plate.status" >
+                <vdl-option *ngFor="let s of getPlateStatusKeys()" [value]="s">{{plateStatusNames.get(s)}}</vdl-option>
+            </vdl-select>
+        </vdl-form-field>   
+           <vdl-form-field label="Date Sold" class="tinyField">
+            <input vdlInput type="text" [(ngModel)]="plate.dateBSold" placeholder="YYYY-MM-DD"/>
+        </vdl-form-field>
+
+
+    <vdl-form-field VdlTextareaAutosize label="Details (Condition, plates, etc.)">
+        <textarea vdlInput type="text" [(ngModel)]="plate.details" rows=5 ></textarea>
+    </vdl-form-field>
+
+    <vdl-form-field label="Relative URL">
+        <button *ngIf="plate.urlRelative" vdl-icon-button (click)=launchImageUrl(plate.urlRelative)>
+            <vdl-icon fontSet="fontawesome" fontIcon="fa-external-link"></vdl-icon>
+        </button>       
+        <input vdlInput type="text" [(ngModel)]="plate.urlRelative" placeholder="1800/1815_Forbes_OrientalMemoires/"/>
+    </vdl-form-field>
+
+    <vdl-form-field label="Subject" class="mediumField">    
+            Current subject: {{plate.subject?.parentName}}: {{plate.subject?.subjectName}}
+            <vdl-select [(ngModel)]="plate.subject" >
+                <vdl-option *ngFor="let s of subjects" [value]="s">{{s.parentName}}: {{s.subjectName}}</vdl-option>
+            </vdl-select>
+   </vdl-form-field>   
+
+ 
+   </div>
+
+    <button vdl-primary-button (click)="upsertPlate()">{{plate.id ? 'Update' : 'Create'}}</button>
+    <button vdl-secondary-button (click)="deletePlate()">Delete</button>
+    <button vdl-secondary-button (click)="listPlates()">Cancel</button>
+</vdl-panel>
+
+<vdl-panel *ngIf="pageType==PAGE_TYPE.LIST_PLATES">
+<vdl-title-bar title="Plate Inventory"></vdl-title-bar>
+   <fieldset style='width: 100%'>
+        <legend>Seach plates:</legend>
+            <input type="text" [(ngModel)]="searchValue"/>
+            <button (click)="searchPlates(SEARCH_TYPE.YEAR)">By Year</button>
+            <button (click)="searchPlates(SEARCH_TYPE.AUTHOR)">By Author</button>
+
+    </fieldset> 
+
+
+   <button vdl-primary-button (click)='newPlate()'>New Plate</button>
+
+   <button vdl-secondary-button (click)="exportPlates()">Export</button>
+
+   <button vdl-secondary-button (click)="print()">Print</button>
+
+   <p>Show On Sale: {{ selectedOnSale }}
+   <p>Show Status: {{ selectedPlateStatus }}
+</vdl-panel>
+
+<vdl-panel *ngIf="pageType==PAGE_TYPE.SALE_PLATES">
+    <vdl-title-bar title="Sale Plates"></vdl-title-bar>
+
+    <button vdl-secondary-button (click)="print()">Print</button>
+
+ </vdl-panel>
+
+<vdl-panel *ngIf="pageType==PAGE_TYPE.SELECTED_PLATES">
+    <vdl-title-bar title="Selected Plates"></vdl-title-bar>
+
+    <button vdl-secondary-button (click)="clearSelected()">Clear Selected</button>
+
+    <button vdl-secondary-button (click)="print()">Print</button>
+
+    <p>
+        <vdl-form-field label="Status" class="tinyField">
+            <vdl-select [(ngModel)]="statusUpdateValue" >
+                <vdl-option *ngFor="let s of getPlateStatusKeys()" [value]="s">{{plateStatusNames.get(s)}}</vdl-option>
+            </vdl-select>
+        </vdl-form-field>  
+        <button vdl-secondary-button (click)="bulkFieldUpdate('status')">Bulk Status Update</button>
+
+        <vdl-form-field label="Sale Percent" class="tinyField">
+            <input vdlInput type="text" [(ngModel)]="saleUpdateValue" />
+        </vdl-form-field>
+          <button vdl-secondary-button (click)="bulkFieldUpdate('salePercent')">Bulk Sale Percent Update</button>
+    </vdl-panel>
+
+
+
+
+
+
+<vdl-panel *ngIf="pageType==PAGE_TYPE.LIST_PLATES || pageType==PAGE_TYPE.SELECTED_PLATES || pageType==PAGE_TYPE.SALE_PLATES">
+    <table class="vdl-data-table material striped">
+		<tr>
+            <th colspan=2></th>
+            <th colspan=3></th>
+            <th colspan=4>Price</th>
+        </tr>
+		<tr>
+            <th colspan=2></th>
+            <th>ID</th>
+            <th>URL</th>
+            <th>Year</th>
+            <th>Author</th>
+            <th>Name</th>
+            <th>List</th>
+            <th>Sale %</th>
+            <th>On Sale
+                <vdl-select (selectionChange)="filterPlates()" [(ngModel)]="selectedOnSale">
+                    <vdl-option>All</vdl-option>
+                    <vdl-option value=true>On Sale</vdl-option>
+                    <vdl-option value=false>Not On Sale</vdl-option>
+                </vdl-select>              
+            </th>
+            <th>Status<br/>
+                <vdl-select (selectionChange)="filterPlates()" [(ngModel)]="selectedPlateStatus">
+                    <vdl-option value="0">All</vdl-option>
+                    <vdl-option *ngFor="let s of getPlateStatusKeys()" [value]="s">{{plateStatusNames.get(s)}}</vdl-option>
+                </vdl-select>
+
+            </th>
+       </tr>
+		<tr [ngClass]="{'data-table-row-odd':o}" *ngFor='let b of plates | bookStatusFilter: selectedPlateStatus | onSaleFilter: selectedOnSale; let o=odd;'>
+             <td>
+                <input type=checkbox (click)="toggleSelect(b)" [checked]="isSelected(b)" />
+            </td><td align=center>
+                <button vdl-icon-button (click)="editPlate(b.id)">
+                    <vdl-icon fontSet="fontawesome" fontIcon="fa-cog"></vdl-icon>
+                </button>
+            </td>
+			<td align=right>{{b.id}}</td>
+            <td align=center>
+                <button *ngIf="b.urlRelative" vdl-icon-button (click)=launchImageUrl(b.urlRelative)>
+                    <vdl-icon fontSet="fontawesome" fontIcon="fa-external-link"></vdl-icon>
+                </button>
+            </td> 
+            <td>{{b.year}}</td>
+			<td>{{b.author}}</td>
+			<td>{{b.name}}
+                <button *ngIf="b.desc" vdl-icon-button vdlTooltip={{b.desc}}>
+                    <vdl-icon fontSet="fontawesome" fontIcon="fa-info-circle"></vdl-icon>
+                </button>
+                 <button *ngIf="b.notes" vdl-icon-button vdlTooltip={{b.notes}}>
+                    <vdl-icon fontSet="fontawesome" fontIcon="fa-copyright"></vdl-icon>
+                </button>
+           </td>
+			<td>{{b.priceList}}</td>
+			<td>{{b.salePercent > 0 ? b.salePercent : ''}}</td>
+			<td>{{b.onSale}}</td>
+			<td>{{b.status}}</td>
+
+        </tr>
+	</table>
+</vdl-panel>
+
+

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../../services/api.service';
+import { ApiService, ITEM_TYPE } from '../../services/api.service';
 import { Book, BOOK_STATUS } from '../../model/book';
 
 @Component({
@@ -17,7 +17,7 @@ export class ExportComponent implements OnInit {
     }
 
     searchBooksByStatus(status: string) {
-        this.apiService.searchBooksBy('status', status).subscribe(
+        this.apiService.searchItemsBy(ITEM_TYPE.BOOK, 'status', status).subscribe(
             success => {
                 this.books = success;
             },

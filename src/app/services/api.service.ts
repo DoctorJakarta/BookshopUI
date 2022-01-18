@@ -10,10 +10,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 const _service = 'http://localhost:8080/BookshopAPI/api/v1.0/';
-///const _service = 'http://3.133.35.100/BookshopAPI/api/v1.0/';
+// const _service = 'http://3.133.35.100/BookshopAPI/api/v1.0/';
 
-//const pubHeader = new HttpHeaders().set('Content-Type', 'application/json' );
+// const pubHeader = new HttpHeaders().set('Content-Type', 'application/json' );
 
+export enum ITEM_TYPE {
+  BOOK = 'book',
+  PLATE = 'plate'
+}
 
 @Injectable()
 export class ApiService {
@@ -59,35 +63,39 @@ export class ApiService {
 
 
   //
-  // Book Services
+  // Item Services
   //
 
-  readBooks() {
-    return this.http.get<Array<string>>(_service + 'book', {headers: this.getAuthzHeaders()} );
+  readItems(type: ITEM_TYPE) {
+     return this.http.get<Array<string>>(_service + type, {headers: this.getAuthzHeaders()} );
   }
 
-  readBook(id: number) {
-    return this.http.get<Array<string>>(_service + 'book/' + id, {headers: this.getAuthzHeaders()} );
+  readSaleItems(type: ITEM_TYPE) {
+    return this.http.get<Array<string>>(_service + type + '/sale', {headers: this.getAuthzHeaders()} );
   }
 
-  createBook(book: Book) {
-    return this.http.post<Array<string>>(_service + 'book', JSON.stringify(book), {headers: this.getAuthzHeaders()} );
+  readItem(type: ITEM_TYPE, id: number) {
+    return this.http.get<Array<string>>(_service + type + '/' + id, {headers: this.getAuthzHeaders()} );
   }
 
-  updateBook(book: Book) {
-    return this.http.put<Array<string>>(_service + 'book', JSON.stringify(book), {headers: this.getAuthzHeaders()} );
+  createItem(type: ITEM_TYPE, book: Book) {
+    return this.http.post<Array<string>>(_service + type , JSON.stringify(book), {headers: this.getAuthzHeaders()} );
   }
 
-  bulkUpdateBooks(updateField: string, updateValue: string, bookIds: []) {
-    return this.http.put<Array<string>>(_service + 'book/' + updateField + '/' + updateValue, bookIds, {headers: this.getAuthzHeaders()} );
+  updateItem(type: ITEM_TYPE, book: Book) {
+    return this.http.put<Array<string>>(_service + type, JSON.stringify(book), {headers: this.getAuthzHeaders()} );
   }
 
-  deleteBook(id: number) {
-    return this.http.delete<Array<string>>(_service + 'book/' + id, {headers: this.getAuthzHeaders()} );
+  bulkUpdateItems(type: ITEM_TYPE, updateField: string, updateValue: string, bookIds: []) {
+    return this.http.put<Array<string>>(_service + type + '/' + updateField + '/' + updateValue, bookIds, {headers: this.getAuthzHeaders()} );
   }
 
-  searchBooksBy(type: string, value: string) {
-    return this.http.get<Array<string>>(_service + 'book/' + type + '/' + value, {headers: this.getAuthzHeaders()} );
+  deleteItem(type: ITEM_TYPE, id: number) {
+    return this.http.delete<Array<string>>(_service + type + '/' + id, {headers: this.getAuthzHeaders()} );
+  }
+
+  searchItemsBy(type: ITEM_TYPE, field: string, value: string) {
+    return this.http.get<Array<string>>(_service + type + '/' + field + '/' + value, {headers: this.getAuthzHeaders()} );
   }
 
   // searchBooksByYear(year: number) {

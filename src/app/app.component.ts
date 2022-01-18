@@ -30,6 +30,13 @@ export class AppComponent implements OnInit {
             { displayName: 'On Sale', route: 'book/Sale', icon: 'fa-dollar' }
         ]
     },
+    { displayName: 'Plates', icon: 'fa-book', expanded: true,
+        subCategories: [
+            { displayName: 'Inventory', route: 'plate/List', icon: 'fa-columns' },
+            { displayName: 'Selected', route: 'plate/Selected', icon: 'fa-check-square' },
+            { displayName: 'On Sale', route: 'plate/Sale', icon: 'fa-dollar' }
+        ]
+    },
     { displayName: 'Export', route: 'export', icon: 'fa-download' },
     { displayName: 'Configuration', icon: 'fa-cog', expanded: true,
         subCategories: [

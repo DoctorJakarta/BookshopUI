@@ -5,7 +5,9 @@ import { Tag, TagCheckbox } from '../model/tag';
 
 export enum LOCAL {                         // Names of items saed in Local Storage persisted on next web session
     selectedBookIds = 'selectedBookIds',
-    selectedBooks   = 'selectedBooks'
+    selectedBooks   = 'selectedBooks',
+    selectedPlateIds = 'selectedPlateIds',
+    selectedPlates   = 'selectedPlates'
 }
 
 export enum SESSION {                                 // Names of items saved in Session Storage persisted on next web session
@@ -28,8 +30,10 @@ export class CacheService {
     }
 
     setDefaults(){
-        if ( !this.get(LOCAL.selectedBookIds) ) this.set(LOCAL.selectedBookIds, []);          // Create empty array so .includes doesn't throw error
-        if ( !this.get(LOCAL.selectedBooks) ) this.set(LOCAL.selectedBooks, []);            // Create empty array so .includes doesn't throw error
+        if ( !this.get(LOCAL.selectedBookIds) ) this.set(LOCAL.selectedBookIds, []);            // Create empty array so .includes doesn't throw error
+        if ( !this.get(LOCAL.selectedBooks) ) this.set(LOCAL.selectedBooks, []);                // Create empty array so .includes doesn't throw error
+        if ( !this.get(LOCAL.selectedPlateIds) ) this.set(LOCAL.selectedPlateIds, []);          // Create empty array so .includes doesn't throw error
+        if ( !this.get(LOCAL.selectedPlates) ) this.set(LOCAL.selectedPlates, []);              // Create empty array so .includes doesn't throw error
     }
 
     get(key: SESSION | LOCAL ): any {
