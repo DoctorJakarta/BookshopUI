@@ -157,7 +157,7 @@ export class BookComponent implements OnInit {
     }
 
     searchBooks(searchType: string) {
-        alert('Searching for: ' + this.searchValue);
+        // alert('Searching for: ' + this.searchValue);
         this.router.navigate(['book', PAGE_TYPE.LIST_BOOKS, { searchType: searchType, searchValue: this.searchValue} ] );
     }
     returnToSearch() {
@@ -228,7 +228,7 @@ export class BookComponent implements OnInit {
     }
 
     deleteBook(id: number) {
-        if ( confirm('Are you sure you want to delete the book, instead of inactivating it?')) {
+        if ( confirm('Are you sure you want to delete the book?')) {
             this.apiService.deleteItem(ITEM_TYPE.BOOK, id).subscribe(
                 success => {
                     this.listBooks();

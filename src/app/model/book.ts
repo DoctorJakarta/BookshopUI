@@ -7,7 +7,8 @@ export enum BOOK_STATUS {
   // The values enum NAME is passed into the JSON request, and the java enum name is returned as a string.  T
   PREP = 'PREP',
   REPAIR = 'REPAIR',
-  LIST = 'LIST',
+  INQUIRE = 'INQUIRE',
+  PRICED = 'PRICED',
 //  SALE = 'SALE',
   HOLD = 'HOLD',
   KEEP = 'KEEP',
@@ -18,7 +19,8 @@ const BookStatusNames = new Map<string, string>([
   // These are the display Names
   [BOOK_STATUS.PREP, 'Catalog in Progress'],
   [BOOK_STATUS.REPAIR, 'In Repair'],
-  [BOOK_STATUS.LIST, 'In Store'],
+  [BOOK_STATUS.INQUIRE, 'Inquire'],
+  [BOOK_STATUS.PRICED, 'Priced'],
 //  [BOOK_STATUS.SALE, 'On Sale'],
   [BOOK_STATUS.HOLD, 'Being Held'],
   [BOOK_STATUS.KEEP, 'Not For Sale'],

@@ -32,6 +32,8 @@ export class LoginComponent {
         this.getTags();
         this.getAttributes();
         this.getSubjects();
+        this.getPlateSources();
+        this.getPlateSizes();
 
       },
       error => this.apiService.handleError(error)
@@ -77,6 +79,22 @@ export class LoginComponent {
         this.apiService.readSubjects().subscribe(
             success => {
                this.cacheService.setSubjects(success);            // Cache is refreshed whenever List is called, which happens after New/Update
+            },
+            error => this.apiService.handleError(error)
+        );
+    }
+    getPlateSources() {
+        this.apiService.readPlateSources().subscribe(
+            success => {
+               this.cacheService.setSources(success);            // Cache is refreshed whenever List is called, which happens after New/Update
+            },
+            error => this.apiService.handleError(error)
+        );
+    }
+    getPlateSizes() {
+        this.apiService.readPlateSizes().subscribe(
+            success => {
+               this.cacheService.setSizes(success);            // Cache is refreshed whenever List is called, which happens after New/Update
             },
             error => this.apiService.handleError(error)
         );

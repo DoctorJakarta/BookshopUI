@@ -214,4 +214,20 @@ export class ApiService {
   deleteDetail(id: number) {
     return this.http.delete<Array<string>>(_service + 'detail/' + id, {headers: this.getAuthzHeaders()} );
   }
+
+  //
+  // Plate Source Services
+  //
+
+  readPlateSources() {
+    return this.http.get<Array<string>>(_service + 'source', {headers: this.getAuthzHeaders()} );
+  }
+
+  //
+  // Subject Services
+  //
+
+  readPlateSizes() {
+    return this.http.get<Array<string>>(_service + 'size', {headers: this.getAuthzHeaders()} );
+  }
 }

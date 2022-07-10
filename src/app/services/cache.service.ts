@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Attribute } from '../model/attribute';
 import { Subject } from '../model/subject';
+import { Source } from '../model/source';
+import { Size } from '../model/size';
 import { Tag, TagCheckbox } from '../model/tag';
 
 export enum LOCAL {                         // Names of items saed in Local Storage persisted on next web session
@@ -21,6 +23,8 @@ export class CacheService {
 
     attributes: Attribute[] = [];
     subjects: Subject[] = [];
+    sources: Source[] = [];
+    sizes: Size[] = [];
 
     tagList: Tag[];
     tagMap: Map<number, TagCheckbox> = new Map<number, TagCheckbox>();
@@ -102,6 +106,18 @@ export class CacheService {
     }
 
     getSubjects() { return this.subjects; }
+
+    setSources(sources) {
+        this.sources = sources;
+    }
+
+    getSources() { return this.sources; }
+
+    setSizes(sizes) {
+        this.sizes = sizes;
+    }
+
+    getSizes() { return this.sizes; }
 
     private resetTagMap() {
         for ( const t of this.tagList) {

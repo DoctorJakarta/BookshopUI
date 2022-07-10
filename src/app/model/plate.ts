@@ -1,12 +1,14 @@
 import { Subject } from './subject';
-import { Tag } from './tag';
-import { Reference } from './reference';
+import { Source } from './source';
+import { Size } from './size';
+
 
 // This is globally accessible with "reviewStatus.EDIT" after this.reviewStatus = ReviewStatus
 export enum PLATE_STATUS {
   // The values enum NAME is passed into the JSON request, and the java enum name is returned as a string.  T
   PREP = 'PREP',
   REPAIR = 'REPAIR',
+  INQUIRE = 'INQUIRE',
   LIST = 'LIST',
 //  SALE = 'SALE',
   HOLD = 'HOLD',
@@ -18,7 +20,8 @@ const PlateStatusNames = new Map<string, string>([
   // These are the display Names
   [PLATE_STATUS.PREP, 'Catalog in Progress'],
   [PLATE_STATUS.REPAIR, 'In Repair'],
-  [PLATE_STATUS.LIST, 'In Store'],
+  [PLATE_STATUS.INQUIRE, 'Inquire'],
+  [PLATE_STATUS.PRICED, 'Priced'],
 //  [PLATE_STATUS.SALE, 'On Sale'],
   [PLATE_STATUS.HOLD, 'Being Held'],
   [PLATE_STATUS.KEEP, 'Not For Sale'],

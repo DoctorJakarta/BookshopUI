@@ -7,6 +7,6 @@ export class Subject {
     constructor ( id: number, parentName: string, subjectName: string) {
       this.id = id;
       this.parentName = parentName;
-      this.subjectName = subjectName;     
+      this.subjectName = subjectName;
    }
 }

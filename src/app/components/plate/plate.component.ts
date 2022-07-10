@@ -5,6 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Plate, PLATE_STATUS } from '../../model/plate';
 import { Attribute, ATTR } from '../../model/attribute';
 import { Subject } from '../../model/subject';
+import { Source } from '../../model/source';
+import { Size } from '../../model/size';
 import { Tag } from '../../model/tag';
 import { TagCheckbox } from '../../model/tag';
 import { Reference } from '../../model/reference';
@@ -63,6 +65,8 @@ export class PlateComponent implements OnInit {
     attrReprints: Attribute;
 
     subjects: Subject[] = [];
+    sources: Source[] = [];
+    sizes: Size[] = [];
 
     plates: any;
     plate: any;
@@ -74,8 +78,9 @@ export class PlateComponent implements OnInit {
     searchValue: string;
     searchTag: string;
 
-     statusUpdateValue: any;
+    statusUpdateValue: any;
     saleUpdateValue: any;
+    priceUpdateValue: any;
 
     constructor(private apiService: ApiService, private cacheService: CacheService,
                 private dialog: VdlDialog,
@@ -142,15 +147,13 @@ export class PlateComponent implements OnInit {
 
     getCacheLists() {
         this.subjects = this.cacheService.getSubjects();
-        this.attrBinding = this.cacheService.getAttribute(ATTR.BINDING);
-        this.attrCondition = this.cacheService.getAttribute(ATTR.CONDITION);
-        this.attrSize = this.cacheService.getAttribute(ATTR.SIZE);
-        this.attrRarity = this.cacheService.getAttribute(ATTR.RARITY);
-        this.attrReprints = this.cacheService.getAttribute(ATTR.REPRINTS);
+        this.sources = this.cacheService.getSources();
+        this.sizes = this.cacheService.getSizes();
+        
     }
 
     searchPlates(searchType: string) {
-        alert('Searching for: ' + this.searchValue);
+        // alert('Searching for: ' + this.searchValue);
         this.router.navigate(['plate', PAGE_TYPE.LIST_PLATES, { searchType: searchType, searchValue: this.searchValue} ] );
     }
     returnToSearch() {
@@ -200,8 +203,7 @@ export class PlateComponent implements OnInit {
     }
 
     upsertPlate(plate: Plate) {
-        console.log('Upserting plate with tagCheckboxMap: ' + this.tagCheckboxMap.size);
-       let apiServiceRequest;
+        let apiServiceRequest;
         if ( this.plate.id ) apiServiceRequest = this.apiService.updateItem(ITEM_TYPE.PLATE, this.plate);
         else                 apiServiceRequest = this.apiService.createItem(ITEM_TYPE.PLATE, this.plate);
 
@@ -216,7 +218,7 @@ export class PlateComponent implements OnInit {
     }
 
     deletePlate(id: number) {
-        if ( confirm('Are you sure you want to delete the plate, instead of inactivating it?')) {
+        if ( confirm('Are you sure you want to delete the plate?')) {
             this.apiService.deleteItem(ITEM_TYPE.PLATE, id).subscribe(
                 success => {
                     this.listPlates();
@@ -350,6 +352,9 @@ export class PlateComponent implements OnInit {
                 break;
              case 'salePercent':
                 updateFieldValue = this.saleUpdateValue;
+                break;
+            case 'priceList':
+                updateFieldValue = this.priceUpdateValue;
                 break;
             default:
                 alert('Invalid selection');

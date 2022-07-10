@@ -27,7 +27,7 @@
 <vdl-panel *ngIf="book && (pageType==PAGE_TYPE.NEW_BOOK || pageType==PAGE_TYPE.EDIT_BOOK)">
 <vdl-title-bar title="Book Details"></vdl-title-bar>
     <button vdl-primary-button (click)="upsertBook()">{{book.id ? 'Update' : 'Create'}}</button>
-    <button vdl-secondary-button (click)="deleteBook()">Delete</button>
+    <button vdl-secondary-button (click)="deleteBook(book.id)">Delete</button>
     <button vdl-secondary-button (click)="listBooks()">Cancel</button>
     Tags: <strong *ngFor="let tag of book.tags "> {{tag.name}} - </strong>
 
@@ -187,7 +187,7 @@
    </div>
 
     <button vdl-primary-button (click)="upsertBook()">{{book.id ? 'Update' : 'Create'}}</button>
-    <button vdl-secondary-button (click)="deleteBook()">Delete</button>
+    <button vdl-secondary-button (click)="deleteBook(book.id)">Delete</button>
     <button vdl-secondary-button (click)="listBooks()">Cancel</button>
 </vdl-panel>
 
