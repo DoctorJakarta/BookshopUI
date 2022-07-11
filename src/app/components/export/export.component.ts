@@ -13,7 +13,7 @@ export class ExportComponent implements OnInit {
     books: any;
 
     constructor(private apiService: ApiService) {
-        this.searchBooksByStatus(BOOK_STATUS.LIST);
+        this.searchBooksByStatus(BOOK_STATUS.PRICED);
     }
 
     searchBooksByStatus(status: string) {

@@ -9,7 +9,7 @@ export enum PLATE_STATUS {
   PREP = 'PREP',
   REPAIR = 'REPAIR',
   INQUIRE = 'INQUIRE',
-  LIST = 'LIST',
+  PRICED = 'PRICED',
 //  SALE = 'SALE',
   HOLD = 'HOLD',
   KEEP = 'KEEP',

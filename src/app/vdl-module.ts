@@ -1,6 +1,7 @@
-
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { A11yModule } from '@angular/cdk/a11y';
+
 import { VdlAutocompleteModule } from '@vdlx/vdl-angular/autocomplete';
 import { VdlAvatarModule } from '@vdlx/vdl-angular/avatar';
 import { VdlBadgeModule } from '@vdlx/vdl-angular/badge';
@@ -18,6 +19,7 @@ import { VdlDatepickerModule } from '@vdlx/vdl-angular/datepicker';
 import { VdlDetailsPanelModule } from '@vdlx/vdl-angular/details-panel';
 import { VdlDialogModule } from '@vdlx/vdl-angular/dialog';
 import { VdlDividerModule } from '@vdlx/vdl-angular/divider';
+import { VdlDrawerModule } from '@vdlx/vdl-angular/drawer';
 import { VdlExpansionModule } from '@vdlx/vdl-angular/expansion';
 import { VdlFormFieldModule } from '@vdlx/vdl-angular/form-field';
 import { VdlGlobalHelpModule } from '@vdlx/vdl-angular/global-help';
@@ -41,7 +43,7 @@ import { VdlSidenavModule } from '@vdlx/vdl-angular/sidenav';
 import { VdlSlideToggleModule } from '@vdlx/vdl-angular/slide-toggle';
 import { VdlSliderModule } from '@vdlx/vdl-angular/slider';
 import { VdlSortModule } from '@vdlx/vdl-angular/sort';
-import { VdlStepper2Module } from '@vdlx/vdl-angular/stepper2';
+import { VdlStepperModule } from '@vdlx/vdl-angular/stepper';
 import { VdlTableModule } from '@vdlx/vdl-angular/table';
 import { VdlTabsModule } from '@vdlx/vdl-angular/tabs';
 import { VdlTitleBarModule } from '@vdlx/vdl-angular/title-bar';
@@ -49,12 +51,13 @@ import { VdlToolbarModule } from '@vdlx/vdl-angular/toolbar';
 import { VdlTooltipModule } from '@vdlx/vdl-angular/tooltip';
 import { VdlTopBarModule } from '@vdlx/vdl-angular/top-bar';
 import { VdlTreeModule } from '@vdlx/vdl-angular/tree';
-import { VdlWizard2Module } from '@vdlx/vdl-angular/wizard2';
+import { VdlUtilityPanelModule } from '@vdlx/vdl-angular/utility-panel';
 
 /**
  * NgModule that includes all VDL modules that are required to serve the demo-app.
  */
 @NgModule({
+  imports: [A11yModule],
   exports: [
     FormsModule,
     VdlAutocompleteModule,
@@ -70,6 +73,7 @@ import { VdlWizard2Module } from '@vdlx/vdl-angular/wizard2';
     VdlDetailsPanelModule,
     VdlDialogModule,
     VdlDividerModule,
+    VdlDrawerModule,
     VdlExpansionModule,
     VdlFormFieldModule,
     VdlGlobalHelpModule,
@@ -95,7 +99,7 @@ import { VdlWizard2Module } from '@vdlx/vdl-angular/wizard2';
     VdlSliderModule,
     VdlSlideToggleModule,
     VdlSortModule,
-    VdlStepper2Module,
+    VdlStepperModule,
     VdlTableModule,
     VdlTabsModule,
     VdlTitleBarModule,
@@ -103,7 +107,7 @@ import { VdlWizard2Module } from '@vdlx/vdl-angular/wizard2';
     VdlTooltipModule,
     VdlTopBarModule,
     VdlTreeModule,
-    VdlWizard2Module
+    VdlUtilityPanelModule
   ]
 })
 export class VdlModule {}
