@@ -6,7 +6,7 @@
     </vdl-form-field>     
 
     <button vdl-primary-button (click)="upsertTag(pageType==PAGE_TYPE.NEW_TAG)">{{pageType==PAGE_TYPE.NEW_TAG ? 'Create' : 'Update'}}</button>
-    <button vdl-secondary-button (click)="deleteTag()">Delete</button>
+    <button vdl-secondary-button (click)="deleteTag(tag.key)">Delete</button>
     <button vdl-secondary-button (click)="listTags()">Cancel</button>
 </vdl-panel>
 

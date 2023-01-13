@@ -89,7 +89,7 @@
    </div>
 
     <button vdl-primary-button (click)="upsertPlate()">{{plate.id ? 'Update' : 'Create'}}</button>
-    <button vdl-secondary-button (click)="deletePlate()">Delete</button>
+    <button vdl-secondary-button (click)="deletePlate(plate.id)">Delete</button>
     <button vdl-secondary-button (click)="listPlates()">Cancel</button>
 </vdl-panel>
 
@@ -178,6 +178,7 @@
             </th>
        </tr>
 		<tr [ngClass]="{'data-table-row-odd':o}" *ngFor='let b of plates | bookStatusFilter: selectedPlateStatus | onSaleFilter: selectedOnSale; let o=odd;'>
+ 		<!-- <tr *ngFor='let b of plates | onSaleFilter: selectedOnSale; let o=odd;'> -->
              <td width=15px>
                 <input type=checkbox (click)="toggleSelect(b)" [checked]="isSelected(b)" />
             </td>

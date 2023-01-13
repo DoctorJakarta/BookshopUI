@@ -202,7 +202,7 @@ export class PlateComponent implements OnInit {
         );
     }
 
-    upsertPlate(plate: Plate) {
+    upsertPlate() {
         let apiServiceRequest;
         if ( this.plate.id ) apiServiceRequest = this.apiService.updateItem(ITEM_TYPE.PLATE, this.plate);
         else                 apiServiceRequest = this.apiService.createItem(ITEM_TYPE.PLATE, this.plate);

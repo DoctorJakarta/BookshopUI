@@ -161,7 +161,7 @@
     <fieldset style='width: 100%'>
         <legend>Tags:</legend>
         <label *ngFor="let cb of tagCheckboxMap | keyvalue ">
-                <input type="checkbox" value="{{cb.id}}" [(ngModel)]="cb.value.checked">{{cb.value.name}}
+                <input type="checkbox" value="{{cb.value.id}}" [(ngModel)]="cb.value.checked">{{cb.value.name}}
         </label>   
     </fieldset> 
     <fieldset *ngIf="book.id" style='width: 100%'>
