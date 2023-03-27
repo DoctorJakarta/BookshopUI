@@ -26,7 +26,7 @@
 
 <vdl-panel *ngIf="plate && (pageType==PAGE_TYPE.NEW_PLATE || pageType==PAGE_TYPE.EDIT_PLATE)">
  
-<vdl-title-bar title="Plate Details"></vdl-title-bar>
+<vdl-title-bar titleText="Plate Details"></vdl-title-bar>
     <button vdl-primary-button (click)="upsertPlate()">{{plate.id ? 'Update' : 'Create'}}</button>
     <button vdl-secondary-button (click)="deletePlate(plate.id)">Delete</button>
     <button vdl-secondary-button (click)="listPlates()">Cancel</button>
@@ -94,7 +94,7 @@
 </vdl-panel>
 
 <vdl-panel *ngIf="pageType==PAGE_TYPE.LIST_PLATES">
-<vdl-title-bar title="Plate Inventory"></vdl-title-bar>
+<vdl-title-bar titleText="Plate Inventory"></vdl-title-bar>
    <fieldset style='width: 100%'>
         <legend>Seach plates:</legend>
             <input type="text" [(ngModel)]="searchValue"/>
@@ -115,14 +115,14 @@
 </vdl-panel>
 
 <vdl-panel *ngIf="pageType==PAGE_TYPE.SALE_PLATES">
-    <vdl-title-bar title="Sale Plates"></vdl-title-bar>
+    <vdl-title-bar titleText="Sale Plates"></vdl-title-bar>
 
     <button vdl-secondary-button (click)="print()">Print</button>
 
  </vdl-panel>
 
 <vdl-panel *ngIf="pageType==PAGE_TYPE.SELECTED_PLATES">
-    <vdl-title-bar title="Selected Plates"></vdl-title-bar>
+    <vdl-title-bar titleText="Selected Plates"></vdl-title-bar>
 
     <button vdl-secondary-button (click)="clearSelected()">Clear Selected</button>
 

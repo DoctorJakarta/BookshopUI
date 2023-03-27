@@ -1,4 +1,4 @@
-<vdl-title-bar title="Tags"></vdl-title-bar>
+<vdl-title-bar titleText="Tags"></vdl-title-bar>
 
 <vdl-panel *ngIf="tag && (pageType==PAGE_TYPE.NEW_TAG || pageType==PAGE_TYPE.EDIT_TAG)" class="smallForm">
     <vdl-form-field label="Name" class="smallField">
@@ -6,7 +6,7 @@
     </vdl-form-field>     
 
     <button vdl-primary-button (click)="upsertTag(pageType==PAGE_TYPE.NEW_TAG)">{{pageType==PAGE_TYPE.NEW_TAG ? 'Create' : 'Update'}}</button>
-    <button vdl-secondary-button (click)="deleteTag(tag.key)">Delete</button>
+    <button vdl-secondary-button (click)="deleteTag(tag.id)">Delete</button>
     <button vdl-secondary-button (click)="listTags()">Cancel</button>
 </vdl-panel>
 
@@ -19,12 +19,12 @@
         </tr>
 		<tr [ngClass]="{'data-table-row-odd':o}" *ngFor='let t of tags; let o=odd;'>
             <td align=center>
-                <button vdl-icon-button (click)="editTag(t.key)">
+                <button vdl-icon-button (click)="editTag(t.id)">
                     <vdl-icon fontSet="fontawesome" fontIcon="fa-cog"></vdl-icon>
                 </button>
             </td>
             <td align=center>
-                <button vdl-icon-button (click)="deleteTag(t.key)">
+                <button vdl-icon-button (click)="deleteTag(t.id)">
                     <vdl-icon fontSet="fontawesome" fontIcon="fa-trash"></vdl-icon>
                 </button>
             </td>   

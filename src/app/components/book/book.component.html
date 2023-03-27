@@ -25,11 +25,14 @@
 </vdl-panel>
 
 <vdl-panel *ngIf="book && (pageType==PAGE_TYPE.NEW_BOOK || pageType==PAGE_TYPE.EDIT_BOOK)">
-<vdl-title-bar title="Book Details"></vdl-title-bar>
+<vdl-title-bar titleText="Book Details"></vdl-title-bar>
     <button vdl-primary-button (click)="upsertBook()">{{book.id ? 'Update' : 'Create'}}</button>
     <button vdl-secondary-button (click)="deleteBook(book.id)">Delete</button>
     <button vdl-secondary-button (click)="listBooks()">Cancel</button>
-    Tags: <strong *ngFor="let tag of book.tags "> {{tag.name}} - </strong>
+     Listings:
+        <label *ngFor="let lcb of listingCheckboxMap | keyvalue ">
+                <input type="checkbox" value="{{lcb.value.id}}" [(ngModel)]="lcb.value.checked">{{lcb.value.name}}
+        </label> 
 
     <div class="bookForm">
         <div>
@@ -192,7 +195,7 @@
 </vdl-panel>
 
 <vdl-panel *ngIf="pageType==PAGE_TYPE.LIST_BOOKS">
-<vdl-title-bar title="Book Inventory"></vdl-title-bar>
+<vdl-title-bar titleText="Book Inventory"></vdl-title-bar>
    <fieldset style='width: 100%'>
         <legend>Seach books:</legend>
             <input type="text" [(ngModel)]="searchValue"/>
@@ -203,6 +206,11 @@
                 <option *ngFor="let tag of tags" [value]="tag.name">{{tag.name}}</option>          
             </select>
             <button (click)="searchBooks(SEARCH_TYPE.TAG)">By Tag</button>
+            <select [(ngModel)]="searchValue">
+                <option></option>
+                <option *ngFor="let listing of listings" [value]="listing.name">{{listing.name}}</option>          
+            </select>
+            <button (click)="searchBooks(SEARCH_TYPE.LISTING)">By Listing</button>
     </fieldset> 
 
 
@@ -217,14 +225,14 @@
 </vdl-panel>
 
 <vdl-panel *ngIf="pageType==PAGE_TYPE.SALE_BOOKS">
-    <vdl-title-bar title="Sale Books"></vdl-title-bar>
+    <vdl-title-bar titleText="Sale Books"></vdl-title-bar>
 
     <button vdl-secondary-button (click)="print()">Print</button>
 
  </vdl-panel>
 
 <vdl-panel *ngIf="pageType==PAGE_TYPE.SELECTED_BOOKS">
-    <vdl-title-bar title="Selected Books"></vdl-title-bar>
+    <vdl-title-bar titleText="Selected Books"></vdl-title-bar>
 
     <button vdl-secondary-button (click)="clearSelected()">Clear Selected</button>
 
@@ -334,4 +342,77 @@
 	</table>
 </vdl-panel>
 
+<div *ngIf="pageType==PAGE_TYPE.LISTED_BOOKS">
+    <vdl-title-bar titleText="Listed Books"></vdl-title-bar>
+   <fieldset style='width: 100%'>
+        <legend>Where Listed:</legend>
+            <select [(ngModel)]="searchValue">
+                <option>All Stores</option>
+                <option *ngFor="let listing of listings" [value]="listing.name">{{listing.name}}</option>          
+            </select>
+            <button (click)="searchBooks(SEARCH_TYPE.LISTING)">Search</button>
+    </fieldset> 
 
+    <button vdl-secondary-button (click)="print()">Print</button>
+
+    <table class="vdl-data-table material striped">
+		<tr>
+            <th colspan=2></th>
+            <th colspan=3></th>
+            <th colspan=4>Price</th>
+        </tr>
+		<tr>
+            <th colspan=2></th>
+            <th>ID</th>
+            <th>Listings
+                <vdl-select (selectionChange)="showListedBooks()" [(ngModel)]="selectedListing">
+                    <vdl-option value="">All</vdl-option>
+                    <vdl-option *ngFor="let listing of listings" [value]="listing.id">{{listing.name}}</vdl-option>          
+                </vdl-select> 
+            </th>
+            <th>URL</th>
+            <th>Year</th>
+            <th>Author</th>
+            <th>Title</th>
+            <th>Tags</th>
+            <th>List</th>
+            <th>Sale %</th>
+            <th>On Sale</th>
+            <th>Status</th>
+       </tr>
+		<tr [ngClass]="{'data-table-row-odd':o}" *ngFor='let b of books | bookStatusFilter: selectedBookStatus | onSaleFilter: selectedOnSale; let o=odd;'>
+             <td>
+                <input type=checkbox (click)="toggleSelect(b)" [checked]="isSelected(b)" />
+            </td><td align=center>
+                <button vdl-icon-button (click)="editBook(b.id)">
+                    <vdl-icon fontSet="fontawesome" fontIcon="fa-cog"></vdl-icon>
+                </button>
+            </td>
+            <td align=right>{{b.id}}</td>
+            <td>
+                <span *ngFor="let listing of b.listings">[<a href='{{listing.url}}' target='_blank'>{{listing.name}}] </a></span>  
+            </td>
+            <td align=center>
+                <button *ngIf="b.urlRelative" vdl-icon-button (click)=launchImageUrl(b.urlRelative)>
+                    <vdl-icon fontSet="fontawesome" fontIcon="fa-external-link"></vdl-icon>
+                </button>
+            </td> 
+            <td>{{b.year}}</td>
+			<td>{{b.author}}</td>
+			<td>{{b.title}}</td>
+			<td><div *ngFor="let tag of b.tags">{{tag.name}}</div></td>
+			<td>{{b.priceList}}</td>
+			<td>{{b.salePercent > 0 ? b.salePercent : ''}}</td>
+			<td>{{b.onSale}}</td>
+			<td>{{b.status}}</td>
+<!--        SDon't show DELETE trash can on list.  Must go to details page to delete.
+            <td align=center>
+                <button vdl-icon-button (click)="deleteBook(b.id)">
+                    <vdl-icon fontSet="fontawesome" fontIcon="fa-trash"></vdl-icon>
+                </button>
+            </td>
+-->      
+
+        </tr>
+	</table>
+</div>

@@ -1,0 +1,41 @@
+<vdl-title-bar titleText="Listings"></vdl-title-bar>
+
+<vdl-panel *ngIf="listing && (pageType==PAGE_TYPE.NEW || pageType==PAGE_TYPE.EDIT)" class="smallForm">
+    <vdl-form-field label="Name" class="smallField">
+        <input vdlInput type="text" [(ngModel)]="listing.name"/>
+    </vdl-form-field>     
+    <vdl-form-field label="Url" class="smallField">
+        <input vdlInput type="text" [(ngModel)]="listing.url"/>
+    </vdl-form-field>     
+
+    <button vdl-primary-button (click)="upsertListing(pageType==PAGE_TYPE.NEW)">{{pageType==PAGE_TYPE.NEW ? 'Create' : 'Update'}}</button>
+    <button vdl-secondary-button (click)="deleteListing(listing.id)">Delete</button>
+    <button vdl-secondary-button (click)="listListings()">Cancel</button>
+</vdl-panel>
+
+<vdl-panel *ngIf="pageType==PAGE_TYPE.LIST">
+    <button vdl-primary-button (click)='newListing()'>New Listing</button>
+    <table class="vdl-data-table material striped">
+		<tr>
+            <th colspan=2></th>
+            <th>Name</th>
+        </tr>
+		<tr [ngClass]="{'data-table-row-odd':o}" *ngFor='let l of listings; let o=odd;'>
+            <td align=center>
+                <button vdl-icon-button (click)="editListing(l.id)">
+                    <vdl-icon fontSet="fontawesome" fontIcon="fa-cog"></vdl-icon>
+                </button>
+            </td>
+            <td align=center>
+                <button vdl-icon-button (click)="deleteListing(l.id)">
+                    <vdl-icon fontSet="fontawesome" fontIcon="fa-trash"></vdl-icon>
+                </button>
+            </td>   
+			<td>{{l.name}}: <a href='{{l.url}}' target='_blank'>{{l.url}}</a></td>  
+        </tr>
+	</table>
+</vdl-panel>
+
+
+
+

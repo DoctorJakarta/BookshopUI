@@ -7,6 +7,7 @@ import { ExportComponent } from './components/export/export.component';
 import { AttributeComponent } from './components/attribute/attribute.component';
 import { SubjectComponent } from './components/subject/subject.component';
 import { TagComponent } from './components/tag/tag.component';
+import { ListingComponent } from './components/listing/listing.component';
 
 
 export const ROUTES: Routes = [
@@ -19,5 +20,6 @@ export const ROUTES: Routes = [
   { path: 'attribute/:pageType', component: AttributeComponent },
   { path: 'subject/:pageType', component: SubjectComponent },
   { path: 'tag/:pageType', component: TagComponent },
+  { path: 'listing/:pageType', component: ListingComponent },
   { path: '**', component: LoginComponent }
 ];

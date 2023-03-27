@@ -27,6 +27,7 @@ export class AppComponent implements OnInit {
         subCategories: [
             { displayName: 'Inventory', route: 'book/List', icon: 'fa-columns' },
             { displayName: 'Selected', route: 'book/Selected', icon: 'fa-check-square' },
+            { displayName: 'In Store', route: 'book/Listed', icon: 'fa-shopping-cart' },
             { displayName: 'On Sale', route: 'book/Sale', icon: 'fa-dollar' }
         ]
     },
@@ -34,6 +35,7 @@ export class AppComponent implements OnInit {
         subCategories: [
             { displayName: 'Inventory', route: 'plate/List', icon: 'fa-columns' },
             { displayName: 'Selected', route: 'plate/Selected', icon: 'fa-check-square' },
+            { displayName: 'In Store', route: 'plate/Listed', icon: 'fa-shopping-cart' },
             { displayName: 'On Sale', route: 'plate/Sale', icon: 'fa-dollar' }
         ]
     },
@@ -42,7 +44,8 @@ export class AppComponent implements OnInit {
         subCategories: [
             { displayName: 'Attributes', route: 'attribute/List', icon: 'fa-list-alt' },
             { displayName: 'Subjects', route: 'subject/List', icon: 'fa-sitemap' },
-            { displayName: 'Tags', route: 'tag/List', icon: 'fa-tags' }
+            { displayName: 'Tags', route: 'tag/List', icon: 'fa-tags' },
+            { displayName: 'Listings', route: 'listing/List', icon: 'fa-tags' }
         ]
     }
    ];

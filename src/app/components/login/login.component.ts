@@ -34,7 +34,8 @@ export class LoginComponent {
         this.getSubjects();
         this.getPlateSources();
         this.getPlateSizes();
-
+        this.getListings();
+        
       },
       error => this.apiService.handleError(error)
     );
@@ -54,7 +55,12 @@ export class LoginComponent {
             error => this.apiService.handleError(error)
         );
     }
-
+    getListings() {
+        this.apiService.readListings().subscribe(
+            success => { this.cacheService.setListings(success); },
+            error => this.apiService.handleError(error)
+        );
+    }
 /*     getAttributes() {
         this.apiService.readAttributes().subscribe(
             success => {

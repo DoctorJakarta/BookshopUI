@@ -4,6 +4,7 @@ import { Attribute } from '../model/attribute';
 import { Detail } from '../model/detail';
 import { Subject } from '../model/subject';
 import { Tag } from '../model/tag';
+import { Listing } from '../model/listing';
 import { User } from '../model/user';
 import { HttpHeaders } from '@angular/common/http';
 import { HttpClient } from '@angular/common/http';
@@ -72,6 +73,14 @@ export class ApiService {
 
   readSaleItems(type: ITEM_TYPE) {
     return this.http.get<Array<string>>(_service + type + '/sale', {headers: this.getAuthzHeaders()} );
+  }
+
+  readAllListedItems(type: ITEM_TYPE) {
+    return this.http.get<Array<string>>(_service + type + '/listed', {headers: this.getAuthzHeaders()} );
+  }
+
+  readListedItemsBySiteId(type: ITEM_TYPE, siteId: number ) {
+    return this.http.get<Array<string>>(_service + type + '/listed/' + siteId, {headers: this.getAuthzHeaders()} );
   }
 
   readItem(type: ITEM_TYPE, id: number) {
@@ -229,5 +238,30 @@ export class ApiService {
 
   readPlateSizes() {
     return this.http.get<Array<string>>(_service + 'size', {headers: this.getAuthzHeaders()} );
+  }
+
+
+  //
+  // Listing Services
+  //
+
+  readListings() {
+    return this.http.get<Array<string>>(_service + 'listing', {headers: this.getAuthzHeaders()} );
+  }
+
+  readListing(key: string) {
+    return this.http.get<Array<string>>(_service + 'listing/' + key, {headers: this.getAuthzHeaders()} );
+  }
+
+  createListing(listing: Listing) {
+    return this.http.post<Array<string>>(_service + 'listing', JSON.stringify(listing), {headers: this.getAuthzHeaders()} );
+  }
+
+  updateListing(listing: Listing) {
+    return this.http.put<Array<string>>(_service + 'listing', JSON.stringify(listing), {headers: this.getAuthzHeaders()} );
+  }
+
+  deleteListing(key: string) {
+    return this.http.delete<Array<string>>(_service + 'listing/' + key, {headers: this.getAuthzHeaders()} );
   }
 }

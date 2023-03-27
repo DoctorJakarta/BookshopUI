@@ -6,6 +6,7 @@ import { Book, BOOK_STATUS } from '../../model/book';
 import { Attribute, ATTR } from '../../model/attribute';
 import { Subject } from '../../model/subject';
 import { Tag } from '../../model/tag';
+import { Listing } from '../../model/listing';
 import { TagCheckbox } from '../../model/tag';
 import { Reference } from '../../model/reference';
 import { ReferenceComponent } from '../reference/reference.component';
@@ -22,12 +23,14 @@ export enum PAGE_TYPE {
     EDIT_BOOK = 'Edit',
     EXPORT_BOOKS = 'Export',
     SELECTED_BOOKS = 'Selected',
-    SALE_BOOKS = 'Sale'
+    SALE_BOOKS = 'Sale',
+    LISTED_BOOKS = 'Listed'
 }
 export enum SEARCH_TYPE {
     YEAR    = 'year',
     AUTHOR  = 'author',
-    TAG     = 'tag'
+    TAG     = 'tag',
+    LISTING = 'listing'
 }
 
 @Component({
@@ -70,6 +73,9 @@ export class BookComponent implements OnInit {
     tags: Tag[];
     tagCheckboxMap: Map<number, TagCheckbox>;
 
+    listings: Listing[];
+    listingCheckboxMap: Map<number, TagCheckbox>;
+
     reference: any;
 
     searchType: string;
@@ -81,6 +87,8 @@ export class BookComponent implements OnInit {
     // selectedBooks: any;
     statusUpdateValue: any;
     saleUpdateValue: any;
+
+    selectedListing: any;
 
     constructor(private apiService: ApiService, private cacheService: CacheService,
                 private dialog: VdlDialog,
@@ -99,6 +107,7 @@ export class BookComponent implements OnInit {
             switch (this.pageType) {
                 case PAGE_TYPE.NEW_BOOK:
                     this.tagCheckboxMap = this.cacheService.getTagCheckboxMap(null);
+                    this.listingCheckboxMap = this.cacheService.getListingCheckboxMap(null);
                     this.book = new Book();
                     break;
                 case PAGE_TYPE.EDIT_BOOK:
@@ -106,7 +115,7 @@ export class BookComponent implements OnInit {
                     break;
                 case PAGE_TYPE.LIST_BOOKS:
                 case PAGE_TYPE.EXPORT_BOOKS:
-                     if (params['searchType']) {
+                    if (params['searchType']) {
                         this.searchType = params['searchType'];
                         this.searchValue = params['searchValue'];
                         this.books = this.searchBy(this.searchType, this.searchValue);
@@ -120,6 +129,14 @@ export class BookComponent implements OnInit {
 
                 case PAGE_TYPE.SALE_BOOKS:
                     this.getSaleBooks();
+                    break;
+  
+                case PAGE_TYPE.LISTED_BOOKS:
+                    if (params['listing']) {
+                        this.selectedListing = params['listing'];
+                        this.getListedBooksBySite(this.selectedListing);
+                    }
+                    else this.getAllListedBooks();
                     break;
 
                case PAGE_TYPE.SELECTED_BOOKS:
@@ -149,6 +166,7 @@ export class BookComponent implements OnInit {
     getCacheLists() {
         this.subjects = this.cacheService.getSubjects();
         this.tags = this.cacheService.getTags();
+        this.listings = this.cacheService.getListings();
         this.attrBinding = this.cacheService.getAttribute(ATTR.BINDING);
         this.attrCondition = this.cacheService.getAttribute(ATTR.CONDITION);
         this.attrSize = this.cacheService.getAttribute(ATTR.SIZE);
@@ -158,7 +176,8 @@ export class BookComponent implements OnInit {
 
     searchBooks(searchType: string) {
         // alert('Searching for: ' + this.searchValue);
-        this.router.navigate(['book', PAGE_TYPE.LIST_BOOKS, { searchType: searchType, searchValue: this.searchValue} ] );
+        //this.router.navigate(['book', PAGE_TYPE.LIST_BOOKS, { searchType: searchType, searchValue: this.searchValue} ] );
+        this.router.navigate(['book', this.pageType, { searchType: searchType, searchValue: this.searchValue} ] );
     }
     returnToSearch() {
         console.log('Returning to search with type: ' + this.searchType  );
@@ -196,12 +215,30 @@ export class BookComponent implements OnInit {
             error => this.apiService.handleError(error)
         );
     }
-
+    
+    getAllListedBooks() {
+        this.apiService.readAllListedItems(ITEM_TYPE.BOOK).subscribe(
+            success => {
+                this.books = success;
+            },
+            error => this.apiService.handleError(error)
+        );
+    }
+    
+    getListedBooksBySite(id: number) {
+        this.apiService.readListedItemsBySiteId(ITEM_TYPE.BOOK, id).subscribe(
+            success => {
+                this.books = success;
+            },
+            error => this.apiService.handleError(error)
+        );
+    }
     getBook(id: number) {
         this.apiService.readItem(ITEM_TYPE.BOOK, id).subscribe(
             success => {
                 this.book = success;
                 this.tagCheckboxMap = this.cacheService.getTagCheckboxMap(this.book.tags);
+                this.listingCheckboxMap = this.cacheService.getListingCheckboxMap(this.book.listings);
              },
             error => this.apiService.handleError(error)
         );
@@ -211,6 +248,7 @@ export class BookComponent implements OnInit {
         console.log('Upserting book with tagCheckboxMap: ' + this.tagCheckboxMap.size);
 
         this.book.tags = this.getSelectedTags();
+        this.book.listings = this.getSelectedListings();
 
         console.log('Upserting book with tags: ' + this.book.tags.length);
         let apiServiceRequest;
@@ -289,6 +327,13 @@ export class BookComponent implements OnInit {
         return selectedTags;
     }
 
+    getSelectedListings() {
+        const selectedListings: Listing[] = [];
+        for ( const l of this.cacheService.getListings() ) {
+            if (this.listingCheckboxMap.get(l.id).checked) { selectedListings.push(l); }
+        }
+        return selectedListings;
+    }
     getSaleStatusKeys() {
         return Array.from(this.bookStatusNames.keys());
     }
@@ -305,6 +350,9 @@ export class BookComponent implements OnInit {
         this.router.navigate(['book', PAGE_TYPE.LIST_BOOKS, { bookStatus: this.selectedBookStatus, onSale: this.selectedOnSale }]);
     }
 
+    showListedBooks() {
+        this.router.navigate(['book', PAGE_TYPE.LISTED_BOOKS, { listing: this.selectedListing}]);
+    }
 
     getBookStatusKeys() {
         return Array.from(this.bookStatusNames.keys());

@@ -4,6 +4,7 @@ import { Subject } from '../model/subject';
 import { Source } from '../model/source';
 import { Size } from '../model/size';
 import { Tag, TagCheckbox } from '../model/tag';
+import { Listing, ListingCheckbox } from '../model/listing';
 
 export enum LOCAL {                         // Names of items saed in Local Storage persisted on next web session
     selectedBookIds = 'selectedBookIds',
@@ -28,6 +29,9 @@ export class CacheService {
 
     tagList: Tag[];
     tagMap: Map<number, TagCheckbox> = new Map<number, TagCheckbox>();
+
+    listingList: Listing[];
+    listingMap: Map<number, ListingCheckbox> = new Map<number, ListingCheckbox>();
 
     constructor() {
         this.setDefaults();
@@ -140,6 +144,33 @@ export class CacheService {
         const cbMap = new Map(this.tagMap);                     // You would think this created a new object, but apparently it does not.  Thus resetTagMap() was called.
         if ( selectedTags != null ) {
                 for ( const t of selectedTags ) {
+                    cbMap.get(t.id).checked = true;
+                }
+            }
+            return cbMap;
+    }
+
+
+        private resetListingMap() {
+        for ( const t of this.listingList) {
+            this.listingMap.set(t.id, new ListingCheckbox(t));
+        }
+         console.log('Added listingCheckbox: ' + this.listingMap.size);
+    }
+    
+    setListings(listings) { 
+        this.listingList = listings;
+        this.resetListingMap();
+    }
+
+    getListings() { return this.listingList; }
+
+    getListingCheckboxMap(selectedListings: Listing[]) {
+        this.resetListingMap();
+        console.log('Getting listingCheckbox: ' + this.listingMap.size);
+        const cbMap = new Map(this.listingMap);                     // You would think this created a new object, but apparently it does not.  Thus resetListingMap() was called.
+        if ( selectedListings != null ) {
+                for ( const t of selectedListings ) {
                     cbMap.get(t.id).checked = true;
                 }
             }

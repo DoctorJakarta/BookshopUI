@@ -23,6 +23,7 @@ import { ExportComponent } from './components/export/export.component';
 import { LoginComponent } from './components/login/login.component';
 import { OnSaleFilterPipe } from './pipes/on-sale-filter.pipe';
 import { BookStatusFilterPipe } from './pipes/book-status-filter.pipe';
+import { ListingComponent } from './components/listing/listing.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { BookStatusFilterPipe } from './pipes/book-status-filter.pipe';
     LoginComponent,
     OnSaleFilterPipe,
     BookStatusFilterPipe,
-    OnSaleFilterPipe
+    OnSaleFilterPipe,
+    ListingComponent
   ],
   imports: [
     HttpClientModule,
